@@ -1,43 +1,87 @@
-# Windows image file caches
-Thumbs.db
-ehthumbs.db
+#OS junk files
+[Tt]humbs.db
+*.DS_Store
+*.userprefs
+*.pidb
 
-# Folder config file
-Desktop.ini
+#SASS
+.sass-cache*/
 
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
 
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
 
-# Windows shortcuts
-*.lnk
+#Visual Studio files
+*Publish.xml
+*.[Oo]bj
+*.user
+*.aps
+*.pch
+*.vspscc
+*.vssscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.[Cc]ache
+*.ilk
+*.log
+*.lib
+*.sbr
+*.sdf
+*.opensdf
+*.unsuccessfulbuild
+_UpgradeReport_Files/
+UpgradeLog.*
 
-# =========================
-# Operating System Files
-# =========================
+#Folders
+SimpleAccountManager.Core/
+SimpleAccountManagerV2/
+Bedriftsmelding.Nettside/Content/ExcelSheets/
 
-# OSX
-# =========================
+#Database
+*.mdf
+*.ldf
+Salgsskjermer.Domain/Connections/
+Salgsskjermer.Nettside/App_Data/Connections/
+Salgsskjermer.AppService/App_Data/Connections/
+Salgsskjermer.Service/App_Data/Connections/
+Salgsskjermer.Integration/App_Data/Connections/
 
-.DS_Store
-.AppleDouble
-.LSOverride
 
-# Thumbnails
-._*
+ipch/
+obj/
+[Bb]in
+[Dd]ebug*/
+[Rr]elease*/
 
-# Files that might appear on external disk
-.Spotlight-V100
-.Trashes
+#Tooling
+_ReSharper*/
+*.resharper
+[Tt]est[Rr]esult*
 
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
+#Project files
+[Bb]uild/
+
+#idea
+.idea/workspace.xml
+.idea/tasks.xml
+
+#Subversion files
+.svn
+
+# Office Temp Files
+~$*
+
+#NuGet
+packages/*
+!packages/repositories.config
+
+#node_modules
+!node_modules
+*test-results.xml
+*test-result.txt
+
+#p4merge
+*.orig
