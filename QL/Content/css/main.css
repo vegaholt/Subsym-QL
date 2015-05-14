@@ -1,0 +1,93 @@
+﻿.mainwrapper {
+    padding: 40px 15px 0;
+}
+
+.well {
+    background-color: #fff !important; 
+}
+
+.world-outter {
+    padding: 10px;
+    height: 520px;
+    width: 100%;
+}
+
+#world {
+    position: relative;
+    width: 1000px;
+    height: 500px;
+}
+
+#log {
+    position: relative;
+    width: 100%;
+    height: 150px;
+}
+
+.settings-outter {
+    height: 690px;
+    overflow-y: scroll;
+}
+
+.settings-outter::-webkit-scrollbar { 
+    display: none; 
+}
+
+.element {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    z-index: 1;
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat no-repeat;
+}
+
+.food {
+    background-image: url('../img/food.png');
+}
+
+.poison {
+    background-image: url('../img/poison.png');
+}
+
+.agent {
+    z-index: 2;
+    background-image: url('../img/agent.png');
+}
+
+.hr {
+    position: absolute;
+    left: 0;width: 600px;
+    height: 1px;
+    background-color: #ddd;
+    z-index: 3;
+}
+
+.vr {
+    position: absolute;
+    top: 0;bottom: 0;
+    width: 1px;
+    background-color: #ddd;    
+    z-index: 3;
+}
+
+.iteration-count {
+    text-align: center;
+    height: 110px; width: 100%;
+    font-size: 100px;
+    line-height: 110px;
+    color: #aaa;
+}
+
+.consume-count {
+    display: inline-block;
+    font-size: 60px;
+    color: #aaa;
+    padding-left: 620px;
+}
+
+.consume-count img {
+    display: inline-block;
+    height: 60px;
+}

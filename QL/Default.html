@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>SubSym AI - Project 5 - Reinforced learning - Q-Learning</title>
+    <link href="Content/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="Content/css/main.css" rel="stylesheet"/>
+</head>
+<body>
+<script src="Scripts/jquery-2.1.3.min.js"></script>
+<script src="Scripts/jquery.signalR-2.2.0.js"></script>
+<script src="Scripts/bootstrap.min.js"></script>
+<script src="signalr/hubs"></script>
+<script>
+    var _settings;
+    var _scenarioModel;
+
+    $(function () {
+        //STARTUP SIGNALR FRAMEWORK
+        window.qLHub = $.connection.qLHub;
+
+        $.connection.hub.start().done(function() {
+            qLHub.server.initialize();
+        });
+
+        //CLIENT METHODS
+        window.qLHub.client.hubSetSettings = function (model) {
+            _settings = model;
+            resetUI();
+        }
+
+        window.qLHub.client.hubVisualizeScenario = function (model) {
+            _scenarioModel = model;
+            drawScenario();
+        }
+
+        window.qLHub.client.hubVisualizeIteration = function (count) {
+            drawIterationCount(count);
+        }
+    });
+
+    //SERVER METHODS
+    function programRun() {
+        qLHub.server.programRun();
+    }
+
+    function programStop() {
+        qLHub.server.programStop();
+    }
+
+    function programRestart() {
+        qLHub.server.programRestart();
+    }
+
+    function startSimulation() {
+        qLHub.server.startSimulation();
+    }
+
+    function updateSettings() {
+        qLHub.server.updateSettings(_settings);
+        console.log(_settings);
+    }
+
+    //UI LISTENERS
+    $(document).ready(function () {
+
+        //Start button
+        $("#program-run").click(function() {
+            programRun();
+        });
+
+        //Stop button
+        $("#program-stop").click(function () {
+            programStop();
+        });
+
+        //Restart button
+        $("#program-restart").click(function () {
+            programRestart();
+        });
+
+        //Simulation button
+        $("#program-simulate").click(function () {
+            startSimulation();
+        });
+
+        //Scenario index
+        $("#scenario-index").change(function () {
+            _settings.scenarioIndex = $(this).val();
+            updateSettings();
+        });
+
+        //Number of iterations
+        $("#number-of-iterations").change(function () {
+            _settings.numberOfIterations = $(this).val();
+            updateSettings();
+        });
+
+        //Learning rate
+        $("#learning-rate").change(function () {
+            _settings.learningRate = $(this).val();
+            updateSettings();
+        });
+
+        //Discount rate
+        $("#discount-rate").change(function () {
+            _settings.discountRate = $(this).val();
+            updateSettings();
+        });
+
+        //Epsilon
+        $("#epsilon-rate").change(function () {
+            _settings.epsilon = $(this).val();
+            updateSettings();
+        });
+
+        //History size
+        $("#history-size").change(function () {
+            _settings.historySize = $(this).val();
+            updateSettings();
+        });
+
+        //Interval
+        $("#interval").change(function () {
+            _settings.interval = $(this).val();
+            updateSettings();
+        });
+    });
+
+    //UI FUNCTIONS
+    function resetUI() {
+
+        $("#scenario-index").val(_settings.scenarioIndex);
+        $("#number-of-iterations").val(_settings.numberOfIterations);
+        $("#learning-rate").val(_settings.learningRate);
+        $("#discount-rate").val(_settings.discountRate);
+        $("#epsilon").val(_settings.epsilon);
+        $("#history-size").val(_settings.historySize);
+        $("#interval").val(_settings.interval);
+    }
+
+    function drawScenario() {
+        console.log(_scenarioModel);
+
+        $("#world").empty();
+        for (var i = 0; i < _scenarioModel.scenario.length; i++) {
+            for (var j = 0; j < _scenarioModel.scenario[i].length; j++) {
+                if (_scenarioModel.scenario[i][j] > 0) {
+                    $("#world").append('<div class="element food" style="top:' + (i * 60) + 'px; left:' + (j * 60) + 'px;"></<div>');
+                }
+                else if (_scenarioModel.scenario[i][j] === (-1)) {
+                    $("#world").append('<div class="element poison" style="top:' + (i * 60) + 'px; left:' + (j * 60) + 'px;"></<div>');
+                }
+                console.log(_scenarioModel.scenario[i, j]);
+            }
+        }
+
+        $("#world").append('<div class="element agent" style="top:' + (_scenarioModel.agent.state.position.row * 60) + 'px; left:' + (_scenarioModel.agent.state.position.col * 60) + 'px;"></<div>');
+    }
+    
+    function drawIterationCount(iteration) {
+        $("#log").empty();
+        $("#log").append('<div class="iteration-count">Gen ' + iteration + ' / ' + _settings.numberOfIterations + '</div>');
+    }
+</script>
+
+<div class="mainwrapper">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-default settings-outter">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Settings</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-success btn-md" id="program-run"><span class="glyphicon glyphicon-play"></span></button>
+                        <button type="button" class="btn btn-warning btn-md" id="program-stop"><span class="glyphicon glyphicon-refresh"></span></button>
+                        <button type="button" class="btn btn-danger btn-md" id="program-restart"><span class="glyphicon glyphicon-stop"></span></button>
+                        <button type="button" class="btn btn-primary btn-md" id="program-simulate"><span class="glyphicon glyphicon-move"></span></button>
+                    </div>
+                    <br /><br />
+                    <p>
+                        Scenario Index(1-5)<br/>
+                        <input id="scenario-index" type="number" class="form-control" value="0">
+                    </p>
+                    <p>
+                        #Iterations<br/>
+                        <input id="number-of-iterations" type="number" class="form-control" value="0">
+                    </p>
+                    <p>
+                        Learning rate<br/>
+                        <input id="learning-rate" type="number" class="form-control" value="0">
+                    </p>
+                    <p>
+                        Discount rate<br/>
+                        <input id="discount-rate" type="number" class="form-control" value="0">
+                    </p>
+                    <p>
+                        Epsilon<br />
+                        <input id="epsilon" type="number" class="form-control" value="0">
+                    </p>
+                    <p>
+                        History size<br />
+                        <input id="history-size" type="number" class="form-control" value="0">
+                    </p>
+                    <p>
+                        Interval<br />
+                        <input id="interval" type="number" class="form-control" value="0">
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!--World-->
+        <div class="col-md-9">
+            <div class="well world-outter">
+                <div id="world">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="well" id="log"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
