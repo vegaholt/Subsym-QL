@@ -33,6 +33,8 @@ namespace QL.Managers
             //Init history log Q(state, a, r)
             var qHistory = new Queue<QMap>();
 
+            var c = 0;
+
             //Main loop
             for (int i = 1; i <= settings.NumberOfIterations; i++)
             {
@@ -45,7 +47,7 @@ namespace QL.Managers
 
                 //Reset history
                 qHistory.Clear();
-
+                
                 while (!(agent.State.EatenFoods.Count == scenario.NumberOfFoods && agent.State.Position.Equals(scenario.StartPosition)))//Game is not finished
                 {
                     //Get current state
@@ -93,9 +95,11 @@ namespace QL.Managers
                             QMap.Add(q);
                         }
                     }
+                    c++;
                     //VisualizeScenario(agent, scenarioCopy);
+                    VisualizeIteration(c);
                 }
-                VisualizeIteration(i);
+                //VisualizeIteration(i);
             }
 
             return QMap;
