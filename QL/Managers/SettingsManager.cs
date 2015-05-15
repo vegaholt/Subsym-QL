@@ -13,11 +13,11 @@ namespace QL.Managers
             return new Settings
             {
                 ScenarioIndex = 1,
-                NumberOfIterations = 3000,
+                NumberOfIterations = 1000,
                 LearningRate = 0.1,
                 DiscountRate = 0.5,
-                Epsilon = 0.1,
-                HistorySize = 2,
+                Epsilon = 0.3,
+                HistorySize = 3,
                 Interval = 250
             };
         }

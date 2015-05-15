@@ -33,8 +33,6 @@ namespace QL.Managers
             //Init history log Q(state, a, r)
             var qHistory = new Queue<QMap>();
 
-            var c = 0;
-
             //Main loop
             for (int i = 1; i <= settings.NumberOfIterations; i++)
             {
@@ -47,7 +45,7 @@ namespace QL.Managers
 
                 //Reset history
                 qHistory.Clear();
-                
+
                 while (!(agent.State.EatenFoods.Count == scenario.NumberOfFoods && agent.State.Position.Equals(scenario.StartPosition)))//Game is not finished
                 {
                     //Get current state
@@ -72,34 +70,34 @@ namespace QL.Managers
                     }
                     if (qHistory.Count > settings.HistorySize) qHistory.Dequeue();
 
-                    //New state
-                    var state1 = (State)agent.State.Clone();
-
-                    //Update array(Q, state, a, r) from log
-                    for (int j = qHistory.Count-1; j >= 0; j--)
+                    if (!r.Equals(0))
                     {
-                        var q = qHistory.ElementAt(j);
-                        var futureState = (j == qHistory.Count - 1) ? state1 : qHistory.ElementAt(j + 1).State;
-                        var maxQt1Value = GetBestValue(futureState);
+                        //New state
+                        var state1 = (State)agent.State.Clone();
 
-                        q.Value += settings.LearningRate * (r + settings.DiscountRate * maxQt1Value - q.Value);
+                        //Update array(Q, state, a, r) from log
+                        for (int j = qHistory.Count-1; j >= 0; j--)
+                        {
+                            var q = qHistory.ElementAt(j);
+                            var futureState = (j == qHistory.Count - 1) ? state1 : qHistory.ElementAt(j + 1).State;
+                            var maxQt1Value = GetBestValue(futureState);
+                            var reward = (j == qHistory.Count - 1) ? r : 0;
+                            q.Value += settings.LearningRate * (reward + settings.DiscountRate * maxQt1Value - q.Value);
 
-                        //Add to qMap
-                        var policyQ = QMap.FirstOrDefault(x => x.State.Equals(q.State) && x.A == q.A);
-                        if (policyQ != null)
-                        {
-                            policyQ.Value = q.Value;
-                        }
-                        else
-                        {
-                            QMap.Add(q);
+                            //Add to qMap
+                            var policyQ = QMap.FirstOrDefault(x => x.State.Equals(q.State) && x.A == q.A);
+                            if (policyQ != null)
+                            {
+                                policyQ.Value = q.Value;
+                            }
+                            else
+                            {
+                                QMap.Add(q);
+                            }
                         }
                     }
-                    c++;
-                    //VisualizeScenario(agent, scenarioCopy);
-                    VisualizeIteration(c);
                 }
-                //VisualizeIteration(i);
+                VisualizeIteration(i.ToString());
             }
 
             return QMap;
@@ -113,27 +111,27 @@ namespace QL.Managers
 
             if (bestQ != null && e > Settings.Epsilon)
             {
-                if (bestQ.Value >= 0 || QInState.Count == 4)
+                if (bestQ.Value > 0 || QInState.Count == 4)
                 {
                     return bestQ.A;
                 }
-                else
-                {
-                    var directions = new List<Direction>();
+             
+                var directions = new List<Direction>();
+                
+                var up = QInState.FirstOrDefault(x => x.A == Direction.Up);
+                var right = QInState.FirstOrDefault(x => x.A == Direction.Right);
+                var down = QInState.FirstOrDefault(x => x.A == Direction.Down);
+                var left = QInState.FirstOrDefault(x => x.A == Direction.Left);
 
-                    if (!QInState.Where(x => x.A == Direction.Up).Any()) directions.Add(Direction.Up);
-                    if (!QInState.Where(x => x.A == Direction.Right).Any()) directions.Add(Direction.Right);
-                    if (!QInState.Where(x => x.A == Direction.Down).Any()) directions.Add(Direction.Down);
-                    if (!QInState.Where(x => x.A == Direction.Left).Any()) directions.Add(Direction.Left);
+                if (up == null || up.Value.Equals(0d)) directions.Add(Direction.Up);
+                if (right == null || right.Value.Equals(0d)) directions.Add(Direction.Right);
+                if (down == null || down.Value.Equals(0d)) directions.Add(Direction.Down);
+                if (left == null || left.Value.Equals(0d)) directions.Add(Direction.Left);
 
-                    var f = Random.Next(directions.Count);
-                    return directions.ElementAt(f);
-                }
+                var f = Random.Next(directions.Count);
+                return directions.ElementAt(f);
             }
-            else
-            {
-                return ScenarioHelper.GetRandomDirection(Random);
-            }
+            return ScenarioHelper.GetRandomDirection(Random);
         }
 
         private double GetBestValue(State state)
@@ -145,26 +143,12 @@ namespace QL.Managers
             {
                 return bestQ.Value;
             }
-            else
-            {
-                return 0;
-            }
+            return 0;
         }
 
-        private void VisualizeIteration(int iterationNumber)
+        private void VisualizeIteration(string iterationNumber)
         {
             Hub.Clients.All.hubVisualizeIteration(iterationNumber);
-        }
-
-        private void VisualizeScenario(Agent agent, int[,] scenarioCopy)
-        {
-            var viewModel = new ViewModel
-            {
-                Scenario = scenarioCopy,
-                Agent = agent
-            };
-
-            Hub.Clients.All.hubVisualizeScenario(viewModel);
         }
     }
 }

@@ -67,8 +67,7 @@ namespace QL.Managers
         private void InitializeScenarios()
         {
             _scenarioList = _scenarioManager.GetInitialScenarios();
-            _scenario = _scenarioList.ElementAt(_settings.ScenarioIndex - 1);
-            VisualizeScenario(_scenario);
+            UpdateScenario();
         }
         #endregion
 
@@ -83,6 +82,8 @@ namespace QL.Managers
 
         public void Stop()
         {
+            _policy.Clear();
+
             //Garbage collection
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -95,19 +96,34 @@ namespace QL.Managers
 
         public void StartSimulation()
         {
-            _simulationManager.Run(_scenario, _policy, _random, _hub);
+            _simulationManager.Run(_scenario, _policy, _random, _settings, _hub);
         }
         #endregion
         
         #region Core logic
 
-        #endregion
+        #endregion d
 
         #region Server Methods
         public void UpdateSettings(Settings settings)
         {
             _settings = settings;
-            _scenario = _scenarioList.ElementAt(_settings.ScenarioIndex - 1);
+            UpdateScenario();
+        }
+
+        private void UpdateScenario()
+        {
+            var index = _settings.ScenarioIndex - 1;
+            if (_settings.ScenarioIndex >= _scenarioList.Count)
+            {
+                index = _scenarioList.Count - 1;
+            }
+            else if (_settings.ScenarioIndex - 1 < 0)
+            {
+                index = 0;
+            }
+
+            _scenario = _scenarioList.ElementAt(index);
             VisualizeScenario(_scenario);
         }
         #endregion
@@ -123,7 +139,10 @@ namespace QL.Managers
             var viewModel = new ViewModel
             {
                 Scenario = scenario.Values,
-                Agent = new Agent { State = new State { Position = new Position { Row = scenario.StartPosition.Row, Col = scenario.StartPosition.Col }, EatenFoods = new List<int>() } }
+                Agent = new Agent { State = new State { Position = new Position { Row = scenario.StartPosition.Row, Col = scenario.StartPosition.Col }, EatenFoods = new List<int>() } },
+                StartPos = new Position { Row = scenario.StartPosition.Row, Col = scenario.StartPosition.Col },
+                Height = scenario.Height,
+                Width = scenario.Width
             };
 
             _hub.Clients.All.hubVisualizeScenario(viewModel);

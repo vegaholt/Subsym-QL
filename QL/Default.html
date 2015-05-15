@@ -57,7 +57,6 @@
 
     function updateSettings() {
         qLHub.server.updateSettings(_settings);
-        console.log(_settings);
     }
 
     //UI LISTENERS
@@ -139,22 +138,42 @@
     }
 
     function drawScenario() {
-        console.log(_scenarioModel);
-
         $("#world").empty();
+
+        var dim = Math.min((500/_scenarioModel.height),(1000/_scenarioModel.width));
+
         for (var i = 0; i < _scenarioModel.scenario.length; i++) {
             for (var j = 0; j < _scenarioModel.scenario[i].length; j++) {
                 if (_scenarioModel.scenario[i][j] > 0) {
-                    $("#world").append('<div class="element food" style="top:' + (i * 60) + 'px; left:' + (j * 60) + 'px;"></<div>');
+                    $("#world").append('<div class="element food" style="top:' + (i * dim) + 'px; left:' + (j * dim) + 'px; width:' + (dim) + 'px; height:' + (dim) + 'px;"></<div>');
                 }
                 else if (_scenarioModel.scenario[i][j] === (-1)) {
-                    $("#world").append('<div class="element poison" style="top:' + (i * 60) + 'px; left:' + (j * 60) + 'px;"></<div>');
+                    $("#world").append('<div class="element poison" style="top:' + (i * dim) + 'px; left:' + (j * dim) + 'px; width:' + (dim) + 'px; height:' + (dim) + 'px;"></<div>');
                 }
-                console.log(_scenarioModel.scenario[i, j]);
+                else if (_scenarioModel.scenario[i][j] === (0)) {
+                    $("#world").append('<div id="e' + i + j + '" class="element" style="top:' + (i * dim) + 'px; left:' + (j * dim) + 'px; width:' + (dim) + 'px; height:' + (dim) + 'px;"></<div>');
+                }
+                else if (_scenarioModel.scenario[i][j] === (-3)) {
+                    $("#world").append('<div id="e' + i + j + '" class="element arrow" style="top:' + (i * dim) + 'px; left:' + (j * dim) + 'px; line-height:' + (dim) + 'px; width:' + (dim) + 'px; height:' + (dim) + 'px;"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span></<div>');
+                }
+                else if (_scenarioModel.scenario[i][j] === (-4)) {
+                    $("#world").append('<div id="e' + i + j + '" class="element arrow" style="top:' + (i * dim) + 'px; left:' + (j * dim) + 'px; line-height:' + (dim) + 'px; width:' + (dim) + 'px; height:' + (dim) + 'px;"><span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span></<div>');
+                }
+                else if (_scenarioModel.scenario[i][j] === (-5)) {
+                    $("#world").append('<div id="e' + i + j + '" class="element arrow" style="top:' + (i * dim) + 'px; left:' + (j * dim) + 'px; line-height:' + (dim) + 'px; width:' + (dim) + 'px; height:' + (dim) + 'px;"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></<div>');
+                }
+                else if (_scenarioModel.scenario[i][j] === (-6)) {
+                    $("#world").append('<div id="e' + i + j + '" class="element arrow" style="top:' + (i * dim) + 'px; left:' + (j * dim) + 'px; line-height:' + (dim) + 'px; width:' + (dim) + 'px; height:' + (dim) + 'px;"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span></<div>');
+                }
             }
         }
 
-        $("#world").append('<div class="element agent" style="top:' + (_scenarioModel.agent.state.position.row * 60) + 'px; left:' + (_scenarioModel.agent.state.position.col * 60) + 'px;"></<div>');
+        var selector = "#e" + _scenarioModel.startPos.row + _scenarioModel.startPos.col;
+        $(selector).addClass("startpos");
+        $("#world").append('<div class="element agent" style="top:' + (_scenarioModel.agent.state.position.row * dim) + 'px; left:' + (_scenarioModel.agent.state.position.col * dim) + 'px; width:' + (dim) + 'px; height:' + (dim) + 'px;"></<div>');
+
+        $("#log").empty();
+        //$("#log").append('<div class="iteration-count">Gen ' + iteration + ' / ' + _settings.numberOfIterations + '</div>');
     }
     
     function drawIterationCount(iteration) {

@@ -37,20 +37,35 @@ namespace QL.Helpers
                 scenarioCopy[agent.State.Position.Row, agent.State.Position.Col] = 0; //remove poison
                 return -3; //return negative reward
             }
-            else if (cellItem > 0) //If food
+            if (cellItem > 0) //If food
             {
                 scenarioCopy[agent.State.Position.Row, agent.State.Position.Col] = 0; //remove food
                 agent.State.EatenFoods.Add(cellItem); //update agent food list
                 return 2; //return positive reward
             }
-            else if (cellItem == -2 && agent.State.EatenFoods.Count == numberOfFoods) //if startPos and all food is eaten
+            if (cellItem == -2 && agent.State.EatenFoods.Count == numberOfFoods) //if startPos and all food is eaten
             {
                 return 1;
             }
-            else 
-            { 
-                return 0;
+            return 0;
+        }
+
+        public static int UpdateScenarioForSimulation(int[,] scenarioCopy, Agent agent, int numberOfFoods)
+        {
+            var cellItem = scenarioCopy[agent.State.Position.Row, agent.State.Position.Col];
+
+            if (cellItem == -1) //If poison
+            {
+                scenarioCopy[agent.State.Position.Row, agent.State.Position.Col] = 0; //remove poison
+                return 1; //return 1 eaten poison
             }
+            if (cellItem > 0) //If food
+            {
+                scenarioCopy[agent.State.Position.Row, agent.State.Position.Col] = 0; //remove food
+                agent.State.EatenFoods.Add(cellItem); //update agent food list
+                return 0; //return 0 eaten poison
+            }
+            return 0;
         }
 
         public static Direction GetRandomDirection(Random random)

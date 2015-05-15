@@ -35,8 +35,6 @@
 
 .element {
     position: absolute;
-    width: 60px;
-    height: 60px;
     z-index: 1;
     background-size: contain;
     background-position: center center;
@@ -54,6 +52,17 @@
 .agent {
     z-index: 2;
     background-image: url('../img/agent.png');
+}
+
+.startpos {
+    background-color: lightblue;
+    border: 1px solid lightskyblue;
+}
+
+.arrow {
+    color: #333 !important;
+    text-align: center;
+    font-size: 30px;
 }
 
 .hr {

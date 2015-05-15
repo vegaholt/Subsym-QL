@@ -13,5 +13,18 @@ namespace QL.Models
 
         [JsonProperty("agent")]
         public Agent Agent { get; set; }
+
+        [JsonProperty("startPos")]
+        public Position StartPos { get; set; }
+
+        [JsonProperty("width")]
+        public int Width { get; set; }
+
+        [JsonProperty("height")]
+        public int Height { get; set; }
+
+        public int NumberOfSteps { get; set; }
+
+        public int NumberOfEatenPoisons { get; set; }
     }
 }
