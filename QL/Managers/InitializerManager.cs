@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNet.SignalR;
-using QL.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Timers;
 using System.Web;
+using QL.Models;
+using Microsoft.AspNet.SignalR;
 
 namespace QL.Managers
 {
@@ -27,6 +28,7 @@ namespace QL.Managers
         private static List<Scenario> _scenarioList;
         private static Scenario _scenario;
         private static Random _random;
+        private static Timer _timer;
 
         public static InitializerManager GetInstance()
         {
@@ -57,6 +59,9 @@ namespace QL.Managers
 
             //Build scenarios
             InitializeScenarios();
+
+            _timer = new Timer(_settings.Interval);
+            _timer.Elapsed += OnTimedEvent;
         }
 
         private void SetInitialSettings()
@@ -96,18 +101,32 @@ namespace QL.Managers
 
         public void StartSimulation()
         {
-            _simulationManager.Run(_scenario, _policy, _random, _settings, _hub);
+            _simulationManager.Run(this, _scenario, _policy, _random, _settings, _hub);
+            _timer.Enabled = true;
         }
+
+        private void OnTimedEvent(object sender, ElapsedEventArgs e)
+        {
+            _simulationManager.OnTimedEvent();
+        }
+
+        public void StopSimulation()
+        {
+            _timer.Enabled = false;
+            //VisualizeScenario(_scenario);
+        }
+
         #endregion
         
         #region Core logic
 
-        #endregion d
+        #endregion
 
         #region Server Methods
         public void UpdateSettings(Settings settings)
         {
             _settings = settings;
+            _timer.Interval = _settings.Interval;
             UpdateScenario();
         }
 

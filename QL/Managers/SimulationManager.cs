@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Web;
+using System.Timers;
 using QL.Models;
 using Microsoft.AspNet.SignalR;
 using QL.Helpers;
@@ -11,50 +12,59 @@ namespace QL.Managers
 {
     public class SimulationManager
     {
+        public InitializerManager InitializerManager { get; set; }
+
         public IHubContext Hub { get; set; }
 
         public List<QMap> Policy { get; set; }
 
+        public Scenario Scenario { get; set; }
+
+        public int[,] ScenarioCopy { get; set; }
+
+        public Agent Agent { get; set; }
+        
         public int NumberOfSteps { get; set; }
 
         public int NumberOfEatenPoisons { get; set; }
+        
+        public Settings Settings { get; set; }
 
-        public void Run(Scenario scenario, List<QMap> policy, Random random, Settings settings, IHubContext hub)
+        public Random Random { get; set; }
+
+        public void Run(InitializerManager initManager, Scenario scenario, List<QMap> policy, Random random, Settings settings, IHubContext hub)
         {
+            InitializerManager = initManager;
             Hub = hub;
             Policy = policy;
+            Scenario = scenario;
+            Agent = new Agent();
+            ScenarioCopy = (int[,]) scenario.Values.Clone();
+            Agent.SetStartPosition(scenario.StartPosition);
             NumberOfSteps = 0;
             NumberOfEatenPoisons = 0;
+            VisualizeScenario(Agent, ScenarioCopy, scenario);
+        }
 
-            //Init agent
-            var agent = new Agent();
+        public void OnTimedEvent()
+        {
+            var currentState = (State) Agent.State.Clone();
 
-            //New copy of scenario
-            var scenarioCopy = (int[,]) scenario.Values.Clone();
+            var q = Policy.Where(x => x.State.Equals(currentState)).OrderByDescending(x => x.Value).FirstOrDefault();
+            var a = (q != null) ? q.A : ScenarioHelper.GetRandomDirection(Random);
 
-            //Reset agent
-            agent.SetStartPosition(scenario.StartPosition);
+            //update agent state, world, and give reward
+            ScenarioHelper.GetNewPosition(a, Agent, Scenario.Height, Scenario.Width);
+            NumberOfEatenPoisons += ScenarioHelper.UpdateScenarioForSimulation(ScenarioCopy, Agent, Scenario.NumberOfFoods);
+            NumberOfSteps++;
 
-            //Draw scenario
-            VisualizeScenario(agent, scenarioCopy, scenario);
+            VisualizeScenarioWithArrows(Agent, ScenarioCopy, Scenario);
 
-            do
+            if (Agent.State.EatenFoods.Count == Scenario.NumberOfFoods &&
+                  Agent.State.Position.Equals(Scenario.StartPosition)) //Game is finished
             {
-                var currentState = (State) agent.State.Clone();
-
-                var q = policy.Where(x => x.State.Equals(currentState)).OrderByDescending(x => x.Value).FirstOrDefault();
-                var a = (q != null) ? q.A : ScenarioHelper.GetRandomDirection(random);
-
-                //update agent state, world, and give reward
-                ScenarioHelper.GetNewPosition(a, agent, scenario.Height, scenario.Width);
-                NumberOfEatenPoisons += ScenarioHelper.UpdateScenarioForSimulation(scenarioCopy, agent, scenario.NumberOfFoods);
-
-                Thread.Sleep(settings.Interval);
-                VisualizeScenarioWithArrows(agent, scenarioCopy, scenario);
-
-            } while (
-                !(agent.State.EatenFoods.Count == scenario.NumberOfFoods &&
-                  agent.State.Position.Equals(scenario.StartPosition))); //Game is not finished
+                InitializerManager.StopSimulation();
+            } 
         }
 
         private void VisualizeScenarioWithArrows(Agent agent, int[,] scenarioCopy, Scenario scenario)
@@ -92,7 +102,9 @@ namespace QL.Managers
                 Agent = agent,
                 StartPos = scenario.StartPosition,
                 Width = scenario.Width,
-                Height = scenario.Height
+                Height = scenario.Height,
+                NumberOfSteps = NumberOfSteps,
+                NumberOfEatenPoisons = NumberOfEatenPoisons
             };
 
             Hub.Clients.All.hubVisualizeScenario(viewModel);

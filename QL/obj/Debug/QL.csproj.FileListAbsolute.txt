@@ -36,4 +36,3 @@ C:\Users\vegaholt\Documents\GitHub\Subsym-QL\QL\bin\Microsoft.Owin.Security.xml
 C:\Users\vegaholt\Documents\GitHub\Subsym-QL\QL\bin\Newtonsoft.Json.xml
 C:\Users\vegaholt\Documents\GitHub\Subsym-QL\QL\obj\Debug\QL.dll
 C:\Users\vegaholt\Documents\GitHub\Subsym-QL\QL\obj\Debug\QL.pdb
-C:\Users\vegaholt\Documents\GitHub\Subsym-QL\QL\obj\Debug\QL.csprojResolveAssemblyReference.cache

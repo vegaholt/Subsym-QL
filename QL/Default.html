@@ -47,12 +47,12 @@
         qLHub.server.programStop();
     }
 
-    function programRestart() {
-        qLHub.server.programRestart();
-    }
-
     function startSimulation() {
         qLHub.server.startSimulation();
+    }
+
+    function stopSimulation() {
+        qLHub.server.stopSimulation();
     }
 
     function updateSettings() {
@@ -72,16 +72,16 @@
             programStop();
         });
 
-        //Restart button
-        $("#program-restart").click(function () {
-            programRestart();
-        });
-
-        //Simulation button
-        $("#program-simulate").click(function () {
+        //Simulation start button
+        $("#simulation-start").click(function () {
             startSimulation();
         });
 
+        //Simulation stop button
+        $("#simulation-stop").click(function () {
+            stopSimulation();
+        });
+        
         //Scenario index
         $("#scenario-index").change(function () {
             _settings.scenarioIndex = $(this).val();
@@ -127,7 +127,6 @@
 
     //UI FUNCTIONS
     function resetUI() {
-
         $("#scenario-index").val(_settings.scenarioIndex);
         $("#number-of-iterations").val(_settings.numberOfIterations);
         $("#learning-rate").val(_settings.learningRate);
@@ -173,7 +172,8 @@
         $("#world").append('<div class="element agent" style="top:' + (_scenarioModel.agent.state.position.row * dim) + 'px; left:' + (_scenarioModel.agent.state.position.col * dim) + 'px; width:' + (dim) + 'px; height:' + (dim) + 'px;"></<div>');
 
         $("#log").empty();
-        //$("#log").append('<div class="iteration-count">Gen ' + iteration + ' / ' + _settings.numberOfIterations + '</div>');
+        $("#log").append('<ul class="list-unstyled"><li><img src="/Content/img/agent.png"/></li><li><p>' + _scenarioModel.numberOfSteps + '</p></li><li><img src="/Content/img/food.png" /></li><li><p>' + _scenarioModel.agent.state.eatenFoods.length + '</p></li><li><img src="/Content/img/poison.png" /></li><li><p>' + _scenarioModel.numberOfEatenPoisons + '</p></li></ul>');
+        console.log(_scenarioModel);
     }
     
     function drawIterationCount(iteration) {
@@ -193,8 +193,8 @@
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-success btn-md" id="program-run"><span class="glyphicon glyphicon-play"></span></button>
                         <button type="button" class="btn btn-warning btn-md" id="program-stop"><span class="glyphicon glyphicon-refresh"></span></button>
-                        <button type="button" class="btn btn-danger btn-md" id="program-restart"><span class="glyphicon glyphicon-stop"></span></button>
-                        <button type="button" class="btn btn-primary btn-md" id="program-simulate"><span class="glyphicon glyphicon-move"></span></button>
+                        <button type="button" class="btn btn-primary btn-md" id="simulation-start"><span class="glyphicon glyphicon-move"></span></button>
+                        <button type="button" class="btn btn-danger btn-md" id="simulation-stop"><span class="glyphicon glyphicon-stop"></span></button>
                     </div>
                     <br /><br />
                     <p>

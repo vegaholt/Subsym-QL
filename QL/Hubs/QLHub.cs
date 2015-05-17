@@ -24,12 +24,6 @@ namespace QL
         }
         public Task ProgramStop()
         {
-            InitializerManager.GetInstance().Stop();
-            return null;
-        }
-
-        public Task ProgramRestart()
-        {
             InitializerManager.GetInstance().Restart();
             InitializerManager.GetInstance().SendSettingsToClient();
             return null;
@@ -38,6 +32,12 @@ namespace QL
         public Task StartSimulation()
         {
             InitializerManager.GetInstance().StartSimulation();
+            return null;
+        }
+
+        public Task StopSimulation()
+        {
+            InitializerManager.GetInstance().StopSimulation();
             return null;
         }
 

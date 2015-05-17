@@ -23,8 +23,10 @@ namespace QL.Models
         [JsonProperty("height")]
         public int Height { get; set; }
 
+        [JsonProperty("numberOfSteps")]
         public int NumberOfSteps { get; set; }
 
+        [JsonProperty("numberOfEatenPoisons")]
         public int NumberOfEatenPoisons { get; set; }
     }
 }

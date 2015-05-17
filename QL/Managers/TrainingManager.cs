@@ -115,7 +115,7 @@ namespace QL.Managers
                 {
                     return bestQ.A;
                 }
-             
+                
                 var directions = new List<Direction>();
                 
                 var up = QInState.FirstOrDefault(x => x.A == Direction.Up);
